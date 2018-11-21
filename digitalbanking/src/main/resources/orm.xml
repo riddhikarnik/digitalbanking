@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<entity-mappings
+	xmlns="http://java.sun.com/xml/ns/persistence/orm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
+	version="2.0">
+
+	<entity class="com.banking.entity.Account" access="FIELD">
+		<table name="accounts" />
+		<attributes>
+			<id name="id">
+				<generated-value strategy="AUTO" />
+			</id>
+			<basic name="createdOn">
+				<column name="creationtimestamp"
+					column-definition="TIMESTAMP" />
+			</basic>
+			<basic name="updatedOn">
+				<column name="updationtimestamp"
+					column-definition="TIMESTAMP" />
+			</basic>
+			<basic name="accountNumber">
+				<column name="accountnumber" length="255" />
+			</basic>
+			<basic name="accounttype">
+				<column name="profile_image_url" length="200" />
+				<enumerated>STRING</enumerated>
+			</basic>
+			<basic name="localcurrency">
+				<column name="currency" />
+			</basic>
+			<basic name="balance">
+				<column name="balance" />
+			</basic>
+			<basic name="enabled">
+				<column name="enabled" column-definition="BOOLEAN" />
+			</basic>
+		</attributes>
+	</entity>
+
+</entity-mappings>

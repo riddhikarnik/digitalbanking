@@ -1,0 +1,82 @@
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS accounts;
+DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS transactionhistory;
+DROP TABLE IF EXISTS accountrules;
+
+
+CREATE TABLE users
+(
+  id MEDIUMINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  login VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  firstname VARCHAR(255) NOT NULL,
+  lastname VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  creationtimestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  enabled BOOLEAN DEFAULT TRUE,
+  roletype ENUM('ADMIN', 'USER', 'EMPLOYEE') NOT NULL
+);
+CREATE UNIQUE INDEX users_unique_login_idx ON Users(login);
+
+CREATE TABLE accounts
+(
+  id MEDIUMINT  PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  user_id MEDIUMINT NOT NULL,
+  accountnumber VARCHAR(255) NOT NULL,
+  accounttype ENUM('CHEQUING', 'SAVINGS', 'BILLING') NOT NULL,
+  localcurrency VARCHAR(3) NOT NULL,
+  balance DECIMAL(20,2) NOT NULL,
+  enabled BOOLEAN DEFAULT true,
+  creationtimestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updationtimestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users (id)
+);
+CREATE UNIQUE INDEX accountnumber_idx ON accounts(accountnumber);
+
+CREATE TABLE transactions
+(
+  id BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  account_id MEDIUMINT NOT NULL,
+  txype ENUM('DEPOSIT', 'WITHDRAW', 'TRANSFERTO', 'TRANSFERREDFROM', 'BILLPAYMENT') NOT NULL,
+  description VARCHAR(255) NOT NULL ,
+  srcamount DECIMAL(20,2) NOT NULL,
+  servicefee DECIMAL(20,2) NOT NULL DEFAULT 0,
+  finalamount  DECIMAL(20,2) NOT NULL,
+  channel ENUM('ATM', 'APP', 'WEB', 'CSR') DEFAULT NULL,
+  referenceaccount VARCHAR(16) DEFAULT NULL,
+  creationtimestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updationtimestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status VARCHAR(16) NOT NULL,
+  FOREIGN KEY (account_id) REFERENCES accounts (id)
+);
+
+CREATE TABLE transactionshistory
+(
+  id BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  tx_id BIGINT NOT NULL,
+  accountid MEDIUMINT NOT NULL,
+  txype ENUM('DEPOSIT', 'WITHDRAW', 'TRANSFERTO', 'TRANSFERREDFROM', 'BILLPAYMENT') NOT NULL,
+  description VARCHAR(255) NOT NULL ,
+  srcamount DECIMAL(20,2) NOT NULL,
+  servicefee DECIMAL(20,2) NOT NULL DEFAULT 0,
+  finalamount  DECIMAL(20,2) NOT NULL,
+  channel ENUM('ATM', 'APP', 'WEB', 'CSR') DEFAULT NULL,
+  refaccountid VARCHAR(64) DEFAULT NULL,
+  creationtimestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updationtimestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status VARCHAR(16) NOT NULL,
+  FOREIGN KEY (tx_id) REFERENCES transactions (id)
+);
+
+CREATE TABLE accountrules
+(
+  accounttype VARCHAR(16) NOT NULL, 
+  rulename VARCHAR(64) NOT NULL,
+  rulevalue VARCHAR(64) NOT NULL,
+  description VARCHAR(255),
+  enabled BOOLEAN DEFAULT false,
+  creationtimestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updationtimestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX rulename_idx ON accountrules(rulename);
